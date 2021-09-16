@@ -32,13 +32,13 @@ app.post('/api/shorturl', function(req, res) {
         const sm = dns.lookup(urlparser.parse(burl).hostname,
         (error, address) => {
                 if(!address){
-                        res.json({error: "Invaild URL"})
+                        res.json({error: "invalid url"})
                 } else {
                         const url = new Url({url: burl})
                         url.save((err, data) => {
                                res.json({
-                                original_URL : data.url,
-                                short_URL : data.id
+                                original_url : data.url,
+                                short_url : data.id
                                })
                         })
                 }
@@ -48,11 +48,11 @@ app.post('/api/shorturl', function(req, res) {
         console.log("sm", sm)
 });
 
-app.get("api/shorturl/:id", (req,res) => {
+app.get("/api/shorturl/:id", (req,res) => {
         const id = req.params.id;
         Url.findById(id, (err, data) => {
                 if(!data){
-                        res.json({error: "Invalid URL"})
+                        res.json({error: "invalid url" })
                 } else {
                         res.redirect(data.url)
                 }
