@@ -25,20 +25,39 @@ app.get('/', function(req, res) {
 });
 
 // Your first API endpoint
-app.post('/api/shorturl', async function(req, res) {
-        console.log(req.body);
-        const burl = req.body.url;
-
-
-        dns.lookup(burl, callback);
-        const url = new Url({url: burl});
- 
-  //12.56
-  
-  await url.save((err, data) => {
-          res.json({created: true})
-  })
+app.post('/api/shorturl', function(req, res) {
+        console.log(req.body)
+        const burl = req.body.url
+        
+        const sm = dns.lookup(urlparser.parse(burl).hostname,
+        (error, address) => {
+                if(!address){
+                        res.json({error: "Invaild URL"})
+                } else {
+                        const url = new Url({url: burl})
+                        url.save((err, data) => {
+                               res.json({
+                                original_URL : data.url,
+                                short_URL : data.id
+                               })
+                        })
+                }
+                console.log("dns", error)
+                console.log("address", address)
+        })
+        console.log("sm", sm)
 });
+
+app.get("api/shorturl/:id", (req,res) => {
+        const id = req.params.id;
+        Url.findById(id, (err, data) => {
+                if(!data){
+                        res.json({error: "Invalid URL"})
+                } else {
+                        res.redirect(data.url)
+                }
+        })
+})
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
